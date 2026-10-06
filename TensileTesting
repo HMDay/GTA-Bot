@@ -314,7 +314,7 @@
         <div class="save-container">
             <button onclick="saveResults()">Save</button>
             <p class="save-legend">
-            Let a member of the staff know that you have completed and you have click the SAVE button on this section, and they will proceed to scan your UCard for check-out.
+            Let a member of the staff know that you've completed and you have click the SAVE button on this section, and they will proceed to scan your UCard for check-out.
             </p>
         </div>
         
