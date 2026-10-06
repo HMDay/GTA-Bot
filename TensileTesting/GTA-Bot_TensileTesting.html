@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tensile Test: Ultimate Tensile Strength</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f7f9;--card:#fff;--ink:#1c2430;--mute:#5f6b7a;--line:#d5dae1;--acc:#1f6feb;--ok:#1a7f45;--okbg:#e4f5ea;--bad:#b42318;--badbg:#fdebea;--curve:#1c2430}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161c;--card:#1b2129;--ink:#e6e9ee;--mute:#9aa5b3;--line:#323b47;--acc:#5b9dff;--ok:#5fd08a;--okbg:#17301f;--bad:#ff8a80;--badbg:#3a1a18;--curve:#e6e9ee}}
+:root[data-theme="dark"]{--bg:#12161c;--card:#1b2129;--ink:#e6e9ee;--mute:#9aa5b3;--line:#323b47;--acc:#5b9dff;--ok:#5fd08a;--okbg:#17301f;--bad:#ff8a80;--badbg:#3a1a18;--curve:#e6e9ee}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:820px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.4rem;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+.step{font-weight:600;color:var(--acc);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+.spec{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.9rem;color:var(--mute);margin-top:8px}
+.wrap{position:relative;width:100%;aspect-ratio:640/380}
+svg{width:100%;height:100%;display:block}
+.ax{stroke:var(--mute);stroke-width:1.5}.gr{stroke:var(--line);stroke-width:1}
+.tk{fill:var(--mute);font-size:12px}.lb{fill:var(--ink);font-size:13px}
+.curve{fill:none;stroke:var(--curve);stroke-width:2.5}
+.opt{cursor:pointer}.opt circle{fill:var(--card);stroke:var(--acc);stroke-width:2}.opt text{fill:var(--acc);font-weight:700;font-size:14px;text-anchor:middle;dominant-baseline:central}
+.opt:hover circle,.opt:focus circle{fill:var(--acc)}.opt:hover text,.opt:focus text{fill:#fff}
+.opt.bad circle{stroke:var(--bad);fill:var(--badbg)}.opt.bad text{fill:var(--bad)}
+.opt.good circle{stroke:var(--ok);fill:var(--ok)}.opt.good text{fill:#fff}
+.opt.locked{pointer-events:none}
+.fb{margin-top:10px;padding:10px 12px;border-radius:8px;font-size:.95rem}
+.fb.ok{background:var(--okbg);color:var(--ok)}.fb.no{background:var(--badbg);color:var(--bad)}
+.callout{position:absolute;left:3%;top:46%;width:min(290px,48%);background:var(--card);border:2px solid var(--acc);border-radius:10px;padding:10px;font-size:.85rem;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.callout[hidden],.card[hidden]{display:none}
+label{display:block;margin:6px 0 2px;font-size:.85rem;color:var(--mute)}
+.row{display:flex;gap:6px;align-items:center}select{width:auto}
+select,input{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
+.u{white-space:nowrap;color:var(--mute);font-size:.85rem}
+button{margin-top:10px;padding:8px 14px;border:0;border-radius:8px;background:var(--acc);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+button.alt{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+.formula{font-family:Georgia,serif;font-size:1.15rem;margin:8px 0}
+.mini{font-size:.85rem;margin-top:6px}
+.mini.ok{color:var(--ok)}.mini.no{color:var(--bad)}
+@media (max-width:560px){.callout{position:static;width:100%;margin-top:10px}#leader{display:none}}
+[hidden]{display:none!important}
+.tabs{display:flex;gap:8px;margin-bottom:14px}.tabs button{margin:0;background:transparent;color:var(--acc);border:1px solid var(--acc)}.tabs button.on{background:var(--acc);color:#fff}
+.qo{display:block;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);font-weight:500}
+.qo:hover{border-color:var(--acc)}.qo.bad{border-color:var(--bad);background:var(--badbg)}.qo.good{border-color:var(--ok);background:var(--okbg)}
+.opt.sel circle{fill:var(--acc)}.opt.sel text{fill:#fff}
+.panel{margin-top:12px;border:2px solid var(--acc);border-radius:10px;padding:10px;max-width:460px}
+.g{display:grid;grid-template-columns:auto 1fr 1fr;gap:6px 8px;align-items:center;font-size:.85rem}.g b{color:var(--mute);font-weight:600}
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.fb.nt{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.tabs{flex-wrap:wrap}
+.g2{display:grid;grid-template-columns:auto 1fr;gap:6px 8px;align-items:center;font-size:.85rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1.6fr;gap:6px 8px;align-items:center;font-size:.85rem}
+.g2 b,.g3 b{color:var(--mute);font-weight:600}
+.mat{margin-bottom:10px;font-size:.9rem;color:var(--mute)}.mat select{font:inherit;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem;margin:8px 0}th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}th{background:var(--bg)}
+.qo.sel2{border-color:var(--acc)}
+.mini,.fb{white-space:pre-line}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.warn{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.wbox{background:var(--card);border:4px solid var(--bad);border-radius:12px;padding:24px;max-width:440px;font-size:1.15rem}
+.wbox button{margin-right:10px}.wbox #wyes{background:var(--bad)}
+</style>
+</head>
+<body>
+<main>
+<h1>Tensile test analysis</h1>
+<div class="mat">Material you are testing: <select id="mat"><option>Steel</option><option>PET</option><option>MDF</option></select></div>
+<div class="mini" id="prog" style="margin:-4px 0 10px"></div>
+<div class="tabs"><button class="on" data-t="uts">Ultimate tensile strength</button><button data-t="ymod">Young's modulus</button><button data-t="ys">0.2% Offset Yield Stress</button><button data-t="sum" hidden>Summary</button></div>
+<section id="uts">
+
+<div class="card">
+  <div class="step">Step 1 · Identify the point</div>
+  <p style="margin:4px 0 10px">Click the point on the curve that corresponds to the <b>UTS</b>.</p>
+  <div class="wrap" id="wrap">
+    <svg id="svg" viewBox="0 0 640 380" role="img" aria-label="Force versus displacement graph"></svg>
+    <div class="callout" id="callout" hidden>
+      <b>Read the peak value off your graph on the Trapezium software*</b>
+      <label for="f">Force</label>
+      <div class="row"><input id="f" type="number" step="any" inputmode="decimal"><span class="u">N</span></div>
+      <div id="more" hidden>
+        <label for="a0">Area</label>
+        <div class="row"><input id="a0" type="number" step="any" inputmode="decimal"><span class="u">mm²</span></div>
+        <label for="sig">Stress</label>
+        <div class="row"><input id="sig" type="number" step="any" inputmode="decimal"><span class="u">MPa</span></div>
+        <button id="chk3">Check</button>
+        <div id="fb3" class="mini"></div>
+      </div>
+    </div>
+  </div>
+  <div class="mini" id="trapnote" hidden>* to pick data points on Trapezium, right click the graph and then from the menu press 'Point Picking Axis 1'</div>
+  <div id="fb1" class="fb" hidden></div>
+</div>
+
+</section>
+<section id="ymod" hidden>
+<div class="card"><div class="step">Question</div><p style="margin:4px 0"><b>What is Young's modulus?</b></p><div id="eopts"></div><div id="efb0" class="fb" hidden></div></div>
+<div class="card" id="eg" hidden><div class="step">Find E (GPa)</div>
+<p style="margin:4px 0 10px">Choose the two points you would take to calculate a dy/dx gradient, giving you the Young's modulus, E (which is normally given in the units of GPa):</p>
+<div class="wrap"><svg id="svgE" viewBox="0 0 640 380" role="img" aria-label="Force versus displacement graph"></svg></div>
+<div id="efb1" class="fb" hidden></div>
+<button class="alt" id="eclear">Clear selection</button>
+<div class="panel" id="ep" hidden><div class="g" id="eg1"></div></div></div>
+</section>
+<section id="ys" hidden>
+<div class="card"><div class="step">Question 1</div><p style="margin:4px 0 10px"><b>Click the yield point on this curve.</b></p>
+<div class="wrap"><svg id="svgY1" viewBox="0 0 640 380" role="img" aria-label="Force versus displacement graph"></svg></div>
+<div id="yfb1" class="fb" hidden></div></div>
+<div class="card" id="y2c" hidden><div class="step">Question 2</div><p style="margin:4px 0 10px"><b>Now click the yield point on this curve.</b></p>
+<div class="wrap"><svg id="svgY2" viewBox="0 0 640 380" role="img" aria-label="Force versus displacement graph with gradual yield"></svg></div>
+<div id="yfb2" class="fb nt" hidden></div>
+<button id="yrev" hidden>Reveal</button>
+<div id="yexp" hidden><p id="yexpt" style="margin:14px 0 10px"></p>
+<div class="wrap"><svg id="svgY3" viewBox="0 0 640 380" role="img" aria-label="Force versus displacement graph with 0.2% offset line"></svg></div>
+<button class="alt" id="ywhy">Why 0.2%?</button><div id="ywhyt" class="fb nt" hidden></div>
+<div><button id="ynext">Continue</button></div></div></div>
+<div class="card" id="y3c" hidden><div class="step">Your data</div>
+<p id="y3t1" style="margin:4px 0 10px"></p>
+<div class="row" style="flex-wrap:wrap;font-size:1.05rem"><span>0.002 ×</span><input id="y_L" type="number" step="any" inputmode="decimal" placeholder="L₀" style="width:110px"><span class="u">mm =</span><b id="y_X" style="min-width:70px">–</b><span class="u">mm</span></div>
+<p id="y3t2" style="margin:14px 0 0"></p><button id="y3next">Continue</button></div>
+<div class="card" id="y4c" hidden><div class="step">Your yield strength</div>
+<div class="wrap"><svg id="svgY4" viewBox="0 0 640 380" role="img" aria-label="Force versus displacement graph with 0.2% offset line"></svg></div>
+<div style="margin-top:12px;max-width:420px">
+<label for="y_F" id="y4l">What is the corresponding force?</label><div class="row"><input id="y_F" type="number" step="any" inputmode="decimal"><span class="u">N</span></div>
+<div id="y4b" hidden><p style="margin:12px 0 0">...and what is the area and stress?</p>
+<label for="y_A">Area</label><div class="row"><input id="y_A" type="number" step="any" inputmode="decimal"><span class="u">mm²</span></div>
+<label for="y_S">Stress</label><div class="row"><input id="y_S" type="number" step="any" inputmode="decimal"><span class="u">MPa</span></div>
+<button id="yc4">Check</button><div id="yfb4" class="mini"></div></div>
+<button id="ysum" hidden>See summary</button></div></div>
+</section>
+<section id="sum" hidden>
+<div class="card"><p id="sumt" style="margin:0"></p><div class="tw"><table id="tmine"></table></div>
+<button id="srev">Click here to see material properties from web sources and manufacturers</button>
+<div id="sref" hidden><p id="sreft" style="margin:12px 0 0"></p><div class="tw"><table id="tref"></table></div></div></div>
+<div id="sq" hidden>
+<div class="card"><p style="margin:0 0 4px"><b>In general, across these materials how well did your UTS match up with these reference values?</b></p><div id="q_uts"></div><div id="qf_uts" class="fb nt" hidden></div></div>
+<div class="card"><p style="margin:0 0 4px"><b>In general, across these materials how well did your 0.2% match up with these reference values?</b></p><div id="q_ys"></div><div id="qf_ys" class="fb nt" hidden></div></div>
+<div class="card"><p style="margin:0 0 4px"><b>In general, across these materials how well did your E match up with these reference values?</b></p><div id="q_E"></div><div id="qf_E" class="fb nt" hidden></div>
+<button class="alt" id="cbtn" hidden>What is Machine Compliance?</button>
+<div id="comp" hidden><p id="compt" style="margin:12px 0 8px"></p><svg viewBox="0 0 720 440" role="img" aria-label="Schematic of a single-column tabletop tensile tester showing machine compliance" style="width:100%;height:auto;display:block">
+<rect x="40" y="380" width="360" height="44" rx="8" fill="#d5d9de" stroke="#9aa3ad"/>
+<rect x="60" y="392" width="120" height="24" rx="4" fill="#eef0f2" stroke="#9aa3ad"/><rect x="66" y="396" width="52" height="16" rx="2" fill="#2b3a4a"/>
+<circle cx="136" cy="404" r="4" fill="#1f6feb"/><circle cx="150" cy="404" r="4" fill="#9aa3ad"/><circle cx="164" cy="404" r="4" fill="#9aa3ad"/>
+<rect x="340" y="50" width="48" height="332" rx="6" fill="#eceff2" stroke="#9aa3ad"/>
+<rect x="200" y="74" width="188" height="34" rx="6" fill="#f7f8fa" stroke="#9aa3ad"/>
+<rect x="236" y="108" width="44" height="26" fill="#8fa3b8" stroke="#6b7785"/>
+<rect x="232" y="134" width="52" height="38" rx="3" fill="#6b7785"/>
+<rect x="252" y="172" width="12" height="122" fill="#c8a77a" stroke="#8a6d43"/>
+<rect x="232" y="294" width="52" height="38" rx="3" fill="#6b7785"/>
+<rect x="252" y="332" width="12" height="50" fill="#6b7785"/>
+<g fill="none" stroke="#e8590c" stroke-width="2" stroke-dasharray="5 4"><rect x="226" y="104" width="64" height="72" rx="6"/><rect x="226" y="290" width="64" height="94" rx="6"/><rect x="196" y="70" width="196" height="42" rx="8"/></g>
+<line x1="180" y1="120" x2="180" y2="76" stroke="#1f6feb" stroke-width="3"/><polygon points="180,66 172,82 188,82" fill="#1f6feb"/>
+<text x="20" y="56" class="lb" fill="#1f6feb">Crosshead moves up</text><text x="20" y="72" class="tk">(recorded as displacement)</text>
+<text x="20" y="220" class="lb" fill="#e8590c">Machine deflects:</text><text x="20" y="237" class="tk">load cell, grips, fixtures,</text><text x="20" y="252" class="tk">crosshead and frame all</text><text x="20" y="267" class="tk">flex a little under load</text>
+<text x="272" y="236" class="lb">Specimen</text>
+<line x1="520" y1="70" x2="600" y2="70" stroke="#6b7785" stroke-width="3"/><line x1="520" y1="330" x2="600" y2="330" stroke="#6b7785" stroke-width="3"/>
+<path d="M560 70 L560 85 L575 95 L545 115 L575 135 L545 155 L560 165 L560 190" fill="none" stroke="#e8590c" stroke-width="2.5"/>
+<path d="M560 190 L560 205 L575 215 L545 240 L575 265 L545 290 L560 305 L560 330" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
+<circle cx="560" cy="190" r="5" fill="#1f6feb"/>
+<text x="585" y="125" class="lb" fill="#e8590c">Machine</text><text x="585" y="141" class="tk">(deflection)</text>
+<text x="585" y="255" class="lb">Specimen</text><text x="585" y="271" class="tk">(extension)</text>
+<text x="420" y="372" class="lb">Crosshead displacement</text><text x="420" y="390" class="lb">= specimen extension</text><text x="420" y="408" class="lb" fill="#e8590c">+ machine deflection</text>
+</svg></div></div>
+<div class="card"><p id="endmsg" style="margin:0;font-weight:600"></p></div>
+</div>
+</section>
+<div class="btns"><button class="alt" id="reset">Restart this tab only</button><button class="alt" id="resetall">Restart ALL</button></div>
+<div class="warn" id="warn" hidden><div class="wbox"><p style="margin-top:0"><b>This will wipe all your data from the entire analysis tool, are you sure?</b></p><button id="wyes">Yes, wipe everything</button><button class="alt" id="wno">Cancel</button></div></div>
+</main>
+
+<script>
+/* ===== EDITABLE CONTENT ===== */
+const CFG = {
+  tolStress: 0.02,   // 2 % tolerance on stress
+  feedback: {
+    correct: "Correct. The UTS is the maximum force the specimen carries, which is the highest point on the curve.",
+    elastic: "Incorrect. [Edit] This is the end of the linear (elastic) region, not the highest force.",
+    necking: "Incorrect. [Edit] Force has already dropped here because the specimen is necking.",
+    fracture: "Incorrect. [Edit] This is the fracture point. The force at fracture is lower than the maximum.",
+    elasticmid: "Incorrect. This is part way along the linear (elastic) region, not the highest force.",
+    slack: "Incorrect. [Edit] This is the slack (toe) region at the start of the test.",
+    plateau: "Incorrect. [Edit] The force here is lower than the maximum.",
+    yieldpeak: "Incorrect. [Edit] This is around the yield point, but the force rises higher later in the test."
+  },
+  step3ok: "Correct. Stress = F/A\nNow click onto the 'Young's Modulus' tab",
+  fillAll: "Fill in every box.",
+  step3badUnits: "Out by a factor of 1000. Check your units (N and mm²).",
+  step3bad: "Not quite. Stress = force / area."
+};
+const CFGE = {
+  tolStress: 0.02, tolStrain: 0.02, tolE: 0.03,
+  options: [
+    {t:"The stiffness of the material, found by calculating the gradient of the linear elastic region", ok:true, fb:"Correct"},
+    {t:"The maximum height on the Y-axis that the stress-strain graph reaches", fb:"Incorrect, this would correspond to the Ultimate Tensile Stress"},
+    {t:"It's the area under the stress-strain curve, within the linear elastic region", fb:"Incorrect, this is actually the amount of strain energy the material has been subjected to."},
+    {t:"The stiffness of the material, taking the gradient between any two points on a stress-strain graph", fb:"Incorrect, Young's Modulus is relevant before the material has reached its yield point - before plasticity occurs."}
+  ],
+  pickOk: "Correct. Both points are in the linear elastic region.",
+  pickSlack: "Incorrect, point {n} is in the 'slack' region, which should be neglected",
+  pickOutside: "Incorrect, point {n} is outside the linear elastic region",
+  fillAll: "Fill in every box.",
+  ssOk: "Stress and strain are correct. Now calculate E.",
+  badStress: "Check your stress values: stress = force / area (N and mm² give MPa).",
+  badStrain: "Check your strain values: strain = displacement / gauge length (no units).",
+  badUnits: "Out by a factor of 1000. E should be in GPa, not MPa.",
+  badE: "Not quite. E = change in stress / change in strain.",
+  ok: "Correct, E = Δσ / Δε within the linear elastic region\nNow click onto the 0.2% Offset Yield Stress tab"
+};
+const CFGY = {
+  y4mdf: "Unlike Steel and PET, the offset line never meets the curve before MDF fractures. In these cases we take the yield point as equal to the UTS. What is the force here?",
+  first: "Great, notice how a Summary tab has now appeared at the top. As you work through, your numbers will automatically be collected there.\nNow choose another material and select it in the dropdown box at the top of this tool.",
+  later: "Great, your numbers have been added to the Summary tab.\nNow choose another material and select it in the dropdown box at the top of this tool.",
+  last: "Great, your numbers have been added to the Summary tab.\nGo to the Summary Tab now to review your results.",
+  finish: "Now complete the UTS and Young's modulus tabs for this material.",
+  unlocked: "You have now completed all three materials. The Summary tab is unlocked.",
+  q1ok: "Correct",
+  q1: {
+    elastic: "Incorrect. [Edit]",
+    peak: "Incorrect. [Edit]",
+    fracture: "Incorrect. [Edit]"
+  },
+  q2: "Not all materials have a well defined yield point. In this case there's no single yield point you can observe easily by eye... however, we do need some method for defining a single value of yield strength.",
+  explain: "...and that's where the 0.2% offset method comes in. We take the initial gradient and slide it across by 0.2% strain on the x-axis. We then use this line and take the point of its intersection with our curve.",
+  why: "It's a semi-arbitrary number that, once upon a time, experts agreed upon that we should all use as standard.",
+  step3: "Look at your Force-Displacement graph on the Trapezium software. 0.2% strain corresponds to a point on the x-axis that is 0.002 × L₀. Where L₀ is the initial length of your sample. Enter your L₀ here.",
+  step4: "On your Trapezium graph, hold up a ruler and set it at the same gradient as the linear elastic region. Then slide it across until the bottom of the ruler starts at {X} mm on the x-axis, then take the point where it intersects your curve."
+};
+const CFGS = {
+  end: "Great, that's all the analysis done! Now go back to the labsheet to Section 6.",
+  intro: "So here are all the properties you've just calculated, plus some given properties for Aluminium.",
+  refIntro: "Reference Values - these are material properties from web sources and manufacturers:",
+  given: ["8.7","99.9","106"],   // Aluminium 1050 given values: E (GPa), 0.2% yield (MPa), UTS (MPa)
+  ref: {
+    "MDF": ["4","(See UTS)","18"],
+    "PET": ["1.5–5","5.5–90","22–95"],
+    "Aluminium 1050": ["69–71","85–103","105–145"],
+    "Stainless 316": ["190–205","206–290","515–620"]
+  },
+  uts: ["Yes, they should be nicely within the ranges of reference values","If any of your UTS values were outside of the ranges shown by the reference table, check with a teacher","If any of your UTS values were outside of the ranges shown by the reference table, check with a teacher"],
+  ys: ["Yes, they should be nicely within the ranges of reference values","If any of your 0.2% yield values were outside of the ranges shown by the reference table, check with a teacher","If any of your 0.2% yield values were outside of the ranges shown by the reference table, check with a teacher"],
+  E: [
+    "Look again. There should be a major discrepancy here: your calculated E will be much lower than the reference values. You followed all the experimental steps correctly, but the method here did not take into account 'machine compliance'.",
+    "Look again. There should be a major discrepancy here: your calculated E will be much lower than the reference values. You followed all the experimental steps correctly, but the method here did not take into account 'machine compliance'.",
+    "Yes, a major discrepancy: your calculated E is much lower than the reference values. You followed all the experimental steps correctly, but the method here did not take into account 'machine compliance'."
+  ],
+  compliance: "Machine compliance is the small elastic deflection of the machine itself under load. The load cell, grips, fixtures, crosshead and frame all stretch, bend or settle slightly. The software records crosshead displacement, which is the specimen's extension plus this machine deflection. Displacement (and so strain) is overestimated, so E = stress / strain comes out too low. Forces are measured directly, so UTS and yield strength are far less affected."
+};
+/* ============================ */
+
+const NS="http://www.w3.org/2000/svg", W=640,H=380, m={l:40,r:16,t:16,b:40}, YM=12;
+let XM=12;
+const X=x=>m.l+x/XM*(W-m.l-m.r), Y=y=>H-m.b-y/YM*(H-m.t-m.b);
+const SL=1.0, XE=1.25, XP=8, XF=10.5;  // slack end, yield, peak, fracture (arbitrary units)
+function F(x){
+  if(x<=SL){const u=x/SL;return 0.6*u+0.25*Math.sin(u*6*Math.PI)*Math.sin(Math.PI*u);} // slack / toe region
+  if(x<=XE) return 0.6+27.6*(x-SL);
+  if(x<=XP){const t=(x-XE)/(XP-XE);return 7.5+2.7*(1-Math.pow(1-t,2.5));}
+  const s=(x-XP)/(XF-XP);return 10.2-1.8*s*s;
+}
+const PEAK={x:XP,y:F(XP)};
+const svg=document.getElementById("svg");
+const el=(n,a,p=svg)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+let OPTS=[];
+
+function draw(){
+  const M=cur();XM=M.xmU;
+  plot(svg,M.U,M.xf,M.drop);
+  el("line",{id:"leader",x1:0,y1:0,x2:0,y2:0,stroke:"var(--acc)","stroke-dasharray":"4 3","stroke-width":1.5,visibility:"hidden"});
+  OPTS=M.ut.map((o,i)=>({...o,l:"ABCD"[i]}));
+  OPTS.forEach(o=>{
+    const g=el("g",{class:"opt",tabindex:0,role:"button","aria-label":"Option "+o.l});
+    el("circle",{cx:X(o.x),cy:Y(M.U(o.x)),r:13},g);
+    el("text",{x:X(o.x),y:Y(M.U(o.x))},g).textContent=o.l;
+    g.onclick=()=>pick(o,g);g.onkeydown=e=>{if(e.key==="Enter"||e.key===" ")pick(o,g)};
+    o.g=g;
+  });
+}
+function pick(o,g){
+  const fb=$("fb1"),M=cur();fb.hidden=false;
+  if(o.k==="correct"){
+    XM=M.xmU;
+    g.classList.add("good");OPTS.forEach(p=>p.g.classList.add("locked"));
+    fb.className="fb nt";fb.textContent=CFG.feedback.correct;
+    const c=$("callout"),r=M.side==="r";c.hidden=false;$("trapnote").hidden=false;
+    c.style.left=r?"auto":"3%";c.style.right=r?"3%":"auto";c.style.top=r?"52%":"46%";
+    const l=$("leader");
+    l.setAttribute("x1",X(M.pk));l.setAttribute("y1",Y(M.U(M.pk)));
+    l.setAttribute("x2",W*M.lead[0]);l.setAttribute("y2",H*M.lead[1]);l.setAttribute("visibility","visible");
+  }else{
+    g.classList.add("bad");fb.className="fb no";fb.textContent=CFG.feedback[o.k];
+  }
+}
+function $(id){return document.getElementById(id)}
+function setFb(e,ok,txt){e.className="fb "+(ok?"ok":"no");e.hidden=false;e.textContent=txt}
+$("f").oninput=()=>{$("more").hidden=!(parseFloat($("f").value)>0)};
+$("chk3").onclick=()=>{
+  const F_=parseFloat($("f").value),a=parseFloat($("a0").value),sg=parseFloat($("sig").value),fb=$("fb3");
+  const say=(ok,t)=>{fb.className="mini "+(ok?"ok":"no");fb.textContent=t};
+  if(!(F_>0&&a>0&&sg>0)){say(false,CFG.fillAll);return}
+  const r=sg/(F_/a);
+  if(Math.abs(r-1)<=CFG.tolStress){say(true,CFG.step3ok);save("uts",sg)}
+  else if(Math.abs(r*1000-1)<=0.05||Math.abs(r/1000-1)<=0.05)say(false,CFG.step3badUnits);
+  else say(false,CFG.step3bad);
+};
+function init(){
+  ["f","a0","sig"].forEach(i=>$(i).value="");$("more").hidden=true;
+  $("fb1").hidden=true;$("fb1").textContent="";$("fb3").textContent="";
+  $("callout").hidden=true;$("trapnote").hidden=true;draw();
+}
+/* ===== Young's modulus tool ===== */
+function FE(x){
+  if(x<=SL)return F(x);
+  if(x<=3)return 0.6+2.7*(x-SL);
+  if(x<=XP){const t=(x-3)/(XP-3);return 6+4.2*(1-Math.pow(1-t,2.5));}
+  const q=(x-XP)/(XF-XP);return 10.2-1.8*q*q;
+}
+const svgE=$("svgE");
+const toe=(x,s_,f0)=>{const u=x/s_;return f0*u+0.25*Math.sin(6*Math.PI*u)*Math.sin(Math.PI*u)};
+const FM=x=>{ // MDF: brittle, linear to sudden fracture
+  if(x<=0.5)return toe(x,0.5,0.4);
+  if(x<=2.9)return 0.4+2.6*(x-0.5);
+  const t=(x-2.9)/0.6;return 6.64+0.9*(1-(1-t)*(1-t));
+};
+const FP=x=>{ // PET: knee at yield, levels off, then creeps up to the max force at fracture
+  if(x<=0.8)return toe(x,0.8,0.4);
+  if(x<=2)return 0.4+3.6*(x-0.8);
+  if(x<=3.2){const t=(x-2)/1.2;return 4.72+1.0*(1-(1-t)*(1-t));}
+  if(x<=7.5)return 5.72+0.5*(x-3.2)/4.3;
+  const t=(x-7.5)/1.3;return 6.22+1.58*t*t;
+};
+const MD={
+ "Steel":{xmU:12,xmE:12,side:"l",U:F,Eg:FE,xf:10.5,pk:XP,lead:[0.462,0.46],drop:false,r:11,k:2.7,d0:SL-0.6/2.7,off:0.9,
+  ut:[{x:XE,k:"elastic"},{x:XP,k:"correct"},{x:9.8,k:"necking"},{x:10.5,k:"fracture"}],
+  ex:[[.45,"s"],[1.4,"l"],[1.9,"l"],[2.4,"l"],[2.8,"l"],[4,"p"],[5.5,"p"],[7,"p"],[9,"p"],[10.5,"p"]]},
+ "MDF":{xmU:9,xmE:5,side:"r",U:FM,Eg:FM,xf:3.5,pk:3.5,lead:[0.5,0.58],drop:true,r:11,k:2.6,d0:0.5-0.4/2.6,off:0.5,
+  ut:[{x:0.3,k:"slack"},{x:3.5,k:"correct"},{x:1.5,k:"elasticmid"},{x:2.6,k:"elasticmid"}],
+  ex:[[.25,"s"],[1,"l"],[1.5,"l"],[2,"l"],[2.5,"l"],[3.1,"p"],[3.3,"p"],[3.5,"p"]]},
+ "PET":{xmU:9.2,xmE:9.2,side:"r",U:FP,Eg:FP,xf:8.8,pk:8.8,lead:[0.8,0.52],drop:false,r:9,k:3.6,d0:0.8-0.4/3.6,off:0.7,
+  ut:[{x:1.4,k:"elastic"},{x:3,k:"yieldpeak"},{x:5.5,k:"plateau"},{x:8.8,k:"correct"}],
+  ex:[[.4,"s"],[1,"l"],[1.3,"l"],[1.6,"l"],[1.9,"l"],[3,"p"],[4.5,"p"],[6,"p"],[7.5,"p"],[8.8,"p"]]}
+};
+const cur=()=>MD[$("mat").value];
+function plot(sv,fn,xf,drop){
+  sv.innerHTML="";
+  for(let i=0;i<=XM;i+=2){el("line",{x1:X(i),x2:X(i),y1:Y(0),y2:Y(YM),class:"gr"},sv);el("line",{x1:X(0),x2:X(XM),y1:Y(i),y2:Y(i),class:"gr"},sv)}
+  el("line",{x1:X(0),x2:X(XM),y1:Y(0),y2:Y(0),class:"ax"},sv);el("line",{x1:X(0),x2:X(0),y1:Y(0),y2:Y(YM),class:"ax"},sv);
+  el("text",{x:(X(0)+X(XM))/2,y:H-10,class:"lb","text-anchor":"middle"},sv).textContent="Displacement";
+  el("text",{transform:`translate(14 ${(Y(0)+Y(YM))/2}) rotate(-90)`,class:"lb","text-anchor":"middle"},sv).textContent="Force";
+  let d="";for(let x=0;x<=xf+1e-9;x+=0.02)d+=(d?"L":"M")+X(x)+" "+Y(fn(x));
+  el("path",{d,class:"curve"},sv);
+  if(drop)el("line",{x1:X(xf),y1:Y(fn(xf)),x2:X(xf+0.03),y2:Y(0.3),class:"curve"},sv);
+}
+let EP,sel,locked;
+function drawE(){
+  const M=cur();XM=M.xmE;plot(svgE,M.Eg,M.xf,M.drop);sel=[];locked=false;
+  EP=M.ex.map(([x,t],i)=>{
+    const o={x,t,n:i+1},g=el("g",{class:"opt",tabindex:0,role:"button","aria-label":"Point "+o.n},svgE);
+    el("circle",{cx:X(x),cy:Y(M.Eg(x)),r:M.r},g);el("text",{x:X(x),y:Y(M.Eg(x))},g).textContent=o.n;
+    g.onclick=()=>ePick(o);g.onkeydown=e=>{if(e.key==="Enter"||e.key===" ")ePick(o)};o.g=g;return o});
+}
+function ePick(o){
+  if(locked)return;
+  const fb=$("efb1");
+  if(sel.includes(o)){sel=sel.filter(p=>p!==o);o.g.classList.remove("sel");return}
+  sel.push(o);o.g.classList.add("sel");
+  if(sel.length<2)return;
+  fb.hidden=false;
+  if(sel.every(p=>p.t==="l")){
+    locked=true;fb.className="fb ok";fb.textContent=CFGE.pickOk;
+    sel.forEach(p=>{p.g.classList.remove("sel");p.g.classList.add("good")});EP.forEach(p=>p.g.classList.add("locked"));
+    $("ep").hidden=false;
+  }else{
+    fb.className="fb no";fb.textContent=sel.filter(p=>p.t!=="l").map(p=>(p.t==="s"?CFGE.pickSlack:CFGE.pickOutside).replace("{n}",p.n)).join("\n");
+    sel.forEach(p=>p.g.classList.remove("sel"));sel=[];
+  }
+}
+const ROWS=[["Force (N)","f1","f2"],["Displacement (mm)","d1","d2"]],ROWS2=[["Area (mm²)","a"],["Gauge length (mm)","L"],["Stress (MPa)","s1","s2"],["Strain","e1","e2"]];
+const inp=id=>`<input id="e_${id}" type="number" step="any" inputmode="decimal">`;
+function buildPanel(){
+  const row=r=>`<b>${r[0]}</b>${inp(r[1])}${r[2]?inp(r[2]):"<span></span>"}`;
+  $("eg1").innerHTML=`<span></span><b>Point 1</b><b>Point 2</b>`+ROWS.map(row).join("")+
+   `<div id="e2" style="display:contents" hidden>${ROWS2.map(row).join("")}<button id="echk2" hidden style="grid-column:1/-1;justify-self:start;margin:0">Check stress and strain</button><div id="efb2a" class="mini" style="grid-column:1/-1;margin:0"></div></div>`+
+   `<div id="e3" style="display:contents" hidden><b>E (GPa)</b>${inp("E")}<span></span></div>`;
+  $("ep").insertAdjacentHTML("beforeend",`<button id="echk" hidden>Check</button><div id="efb2" class="mini"></div>`);
+  $("echk").onclick=checkE;$("echk2").onclick=chk2;
+}
+const ev=id=>parseFloat($("e_"+id).value);
+$("ep").oninput=()=>{
+  const ok=ids=>ids.every(i=>ev(i)>0);
+  $("e2").hidden=!ok(["f1","f2","d1","d2"]);
+  $("echk2").hidden=!ok(["a","L","s1","s2","e1","e2"]);
+};
+const rel=(a,b)=>Math.abs(a-b)/b;
+function ssErr(){
+  if(!["f1","f2","d1","d2","a","L","s1","s2","e1","e2"].every(i=>ev(i)>0))return CFGE.fillAll;
+  if([1,2].some(i=>rel(ev("s"+i),ev("f"+i)/ev("a"))>CFGE.tolStress))return CFGE.badStress;
+  if([1,2].some(i=>rel(ev("e"+i),ev("d"+i)/ev("L"))>CFGE.tolStrain))return CFGE.badStrain;
+  return null;
+}
+function chk2(){
+  const m=ssErr(),f=$("efb2a");f.className="mini "+(m?"no":"ok");f.textContent=m||CFGE.ssOk;
+  if(!m){$("e3").hidden=false;$("echk").hidden=false}
+}
+function checkE(){
+  const say=(ok,t)=>{const f=$("efb2");f.className="mini "+(ok?"ok":"no");f.textContent=t};
+  const m=ssErr();if(m){say(false,m);return}
+  if(!(ev("E")>0)){say(false,CFGE.fillAll);return}
+  const E=(ev("s2")-ev("s1"))/(ev("e2")-ev("e1"))/1000,r=ev("E")/E;
+  if(Math.abs(r-1)<=CFGE.tolE){say(true,CFGE.ok);save("E",ev("E"))}
+  else if(Math.abs(r*1000-1)<.1||Math.abs(r/1000-1)<.1)say(false,CFGE.badUnits);
+  else say(false,CFGE.badE);
+}
+function resetPanel(){$("ep").hidden=true;$("ep").querySelectorAll("#echk,#efb2").forEach(e=>e.remove());buildPanel()}
+$("eclear").onclick=()=>{drawE();$("efb1").hidden=true;resetPanel()};
+function initE(){
+  $("eopts").innerHTML="";$("efb0").hidden=true;$("eg").hidden=true;$("efb1").hidden=true;resetPanel();
+  CFGE.options.forEach(o=>{
+    const b=document.createElement("button");b.className="qo";b.textContent="abcd"[$("eopts").children.length]+") "+o.t;
+    b.onclick=()=>{
+      const f=$("efb0");f.hidden=false;f.textContent=o.fb;
+      if(o.ok){b.classList.add("good");f.className="fb ok";[...$("eopts").children].forEach(c=>c.disabled=true);$("eg").hidden=false;drawE()}
+      else{b.classList.add("bad");f.className="fb no"}
+    };
+    $("eopts").appendChild(b);
+  });
+}
+document.addEventListener("wheel",e=>{if(e.target.type==="number")e.target.blur()},{passive:true});
+/* ===== 0.2% offset yield: concept slides ===== */
+const svgY1=$("svgY1"),svgY2=$("svgY2");
+const G1=x=>{
+  if(x<=2)return 3*x;
+  if(x<=2.3)return 6-(x-2)/0.3*0.8;
+  if(x<=4)return 5.2+0.2*(x-2.3)/1.7;
+  if(x<=9){const t=(x-4)/5;return 5.4+3.2*(1-(1-t)*(1-t));}
+  const s=(x-9)/1.5;return 8.6-1.6*s*s;
+};
+const B2=x=>7*(1-Math.exp(-0.3857*x))+0.3*x;
+const G2=x=>x<=8.5?B2(x):B2(8.5)+0.4*(x-8.5)-0.575*(x-8.5)*(x-8.5);
+function markers(sv,fn,pts,cb){
+  pts.forEach(o=>{
+    const g=el("g",{class:"opt",tabindex:0,role:"button","aria-label":"Option "+o.l},sv);
+    el("circle",{cx:X(o.x),cy:Y(fn(o.x)),r:13},g);el("text",{x:X(o.x),y:Y(fn(o.x))},g).textContent=o.l;
+    g.onclick=()=>cb(o,g);g.onkeydown=e=>{if(e.key==="Enter"||e.key===" ")cb(o,g)};
+  });
+}
+function drawY1(){
+  XM=12;plot(svgY1,G1,XF);
+  markers(svgY1,G1,[{x:1,k:"elastic",l:"A"},{x:2,k:"yield",l:"B"},{x:9,k:"peak",l:"C"},{x:XF,k:"fracture",l:"D"}],(o,g)=>{
+    const fb=$("yfb1");fb.hidden=false;
+    if(o.k==="yield"){
+      g.classList.add("good");svgY1.querySelectorAll(".opt").forEach(p=>p.classList.add("locked"));
+      fb.className="fb ok";fb.textContent=CFGY.q1ok;$("y2c").hidden=false;drawY2();
+    }else{g.classList.add("bad");fb.className="fb no";fb.textContent=CFGY.q1[o.k]}
+  });
+}
+function drawY2(){
+  XM=12;plot(svgY2,G2,XF);
+  markers(svgY2,G2,[{x:1.2,l:"A"},{x:2.5,l:"B"},{x:4.2,l:"C"},{x:7,l:"D"}],(o,g)=>{
+    g.classList.add("sel");svgY2.querySelectorAll(".opt").forEach(p=>p.classList.add("locked"));
+    const fb=$("yfb2");fb.hidden=false;fb.textContent=CFGY.q2;
+    $("yrev").hidden=false;
+  });
+}
+function drawRed(sv,M){
+  XM=M?M.xmE:12;
+  const fn=M?M.Eg:G2,x0=M?M.d0+M.off:0.9,k=M?M.k:3,xf=M?M.xf:XF,line=x=>fn(x)-k*(x-x0);
+  plot(sv,fn,xf,M&&M.drop);
+  el("line",{x1:X(x0),y1:Y(0),x2:X(x0+10/k),y2:Y(10),stroke:"var(--bad)","stroke-width":2.5},sv);
+  if(line(xf)<0){
+    let lo=x0,hi=xf;for(let i=0;i<50;i++){const m=(lo+hi)/2;if(line(m)>0)lo=m;else hi=m}
+    el("circle",{cx:X(lo),cy:Y(fn(lo)),r:7,fill:"none",stroke:"var(--bad)","stroke-width":2.5},sv);
+  }
+  el("text",{x:X(x0+10/k)-6,y:Y(10)-4,class:"lb",fill:"var(--bad)","text-anchor":"end"},sv).textContent="0.2% offset line";
+}
+$("yrev").onclick=()=>{
+  $("yrev").hidden=true;$("yexpt").textContent=CFGY.explain;
+  drawRed($("svgY3"));
+  $("yexp").hidden=false;
+};
+$("ywhy").onclick=()=>{const f=$("ywhyt");f.textContent=CFGY.why;f.hidden=false};
+$("ynext").onclick=()=>{$("y3c").hidden=false;$("y3c").scrollIntoView({behavior:"smooth",block:"nearest"})};
+function y4txt(){const L=parseFloat($("y_L").value);$("y3t2").textContent=CFGY.step4.replace("{X}",L>0?(0.002*L).toPrecision(3):"[the value above]")}
+$("y_L").oninput=()=>{const L=parseFloat($("y_L").value);$("y_X").textContent=L>0?(0.002*L).toPrecision(3):"–";y4txt()};
+function initY(){
+  $("yfb1").hidden=true;$("y2c").hidden=true;$("yfb2").hidden=true;$("yrev").hidden=true;$("yexp").hidden=true;$("ywhyt").hidden=true;$("y3c").hidden=true;$("y4c").hidden=true;$("y4b").hidden=true;$("ysum").hidden=true;$("yfb4").textContent="";["y_F","y_A","y_S"].forEach(i=>$(i).value="");
+  $("y_L").value="";$("y_X").textContent="–";$("y3t1").textContent=CFGY.step3;y4txt();
+  drawY1();
+}
+/* ===== results, yield check, summary ===== */
+const RES={"Steel":{},"PET":{},"MDF":{}};
+const M3=["Steel","PET","MDF"];
+const full=m=>RES[m].E>0&&RES[m].ys>0&&RES[m].uts>0,nDone=()=>M3.filter(full).length;
+function prog(){$("prog").textContent="Progress: "+M3.map(m=>m+" "+["E","ys","uts"].filter(k=>RES[m][k]>0).length+"/3").join(" · ")}
+function save(k,v){RES[$("mat").value][k]=v;prog();if(nDone()>0)document.querySelector('[data-t="sum"]').hidden=false}
+function resetY4(){$("y4c").hidden=true;$("y4b").hidden=true;$("ysum").hidden=true;$("yfb4").textContent="";["y_F","y_A","y_S"].forEach(i=>$(i).value="")}
+$("mat").onchange=()=>{init();initE();initY()};
+$("y3next").onclick=()=>{const M=cur();$("y4l").textContent=M.drop?CFGY.y4mdf:"What is the corresponding force?";$("y4c").hidden=false;drawRed($("svgY4"),M);$("y4c").scrollIntoView({behavior:"smooth",block:"nearest"})};
+$("y_F").oninput=()=>{$("y4b").hidden=!(parseFloat($("y_F").value)>0)};
+$("yc4").onclick=()=>{
+  const F_=parseFloat($("y_F").value),A=parseFloat($("y_A").value),S=parseFloat($("y_S").value),f=$("yfb4");
+  if(!(F_>0&&A>0&&S>0)){f.className="mini no";f.textContent="Fill in every box.";return}
+  if(Math.abs(S/(F_/A)-1)<=0.02){
+    const m=$("mat").value,firstTime=nDone()===0;save("ys",S);
+    f.className="mini ok";
+    f.textContent=!full(m)?"Great, so the 0.2% Offset Yield Strength is "+S+" MPa.\n"+CFGY.finish:firstTime?CFGY.first:nDone()>=3?CFGY.last:CFGY.later;
+  }
+  else{f.className="mini no";f.textContent="Not quite. Stress = force / area."}
+};
+
+const rk=m=>m==="Stainless 316"?"Steel":m;
+const MATS=["MDF","PET","Aluminium 1050","Stainless 316"];
+function fmt(v,dp){return v===undefined?"–":(dp?(+v).toFixed(dp):Math.round(v))}
+function table(el_,rows){
+  el_.innerHTML="<tr><th>Material</th><th>E (GPa)</th><th>0.2% Offset Yield (MPa)</th><th>UTS (MPa)</th></tr>"+rows.map(r=>"<tr>"+r.map((c,i)=>i?`<td>${c}</td>`:`<th>${c}</th>`).join("")+"</tr>").join("");
+}
+function renderSum(){
+  $("sumt").textContent=CFGS.intro;$("endmsg").textContent=CFGS.end;$("sreft").textContent=CFGS.refIntro;
+  table($("tmine"),MATS.map(m=>m==="Aluminium 1050"?[m,...CFGS.given]:[m,fmt(RES[rk(m)].E,1),fmt(RES[rk(m)].ys),fmt(RES[rk(m)].uts)]));
+  table($("tref"),MATS.map(m=>[m,...CFGS.ref[m]]));
+}
+function choice(boxId,fbId,fbs,okIdx,cb){
+  const box=$(boxId);box.innerHTML="";
+  ["Very well","Ok","Miles off"].forEach((t,i)=>{
+    const b=document.createElement("button");b.className="qo";b.textContent=t;
+    b.onclick=()=>{
+      [...box.children].forEach(c=>c.className="qo");
+      b.classList.add(okIdx===undefined?"sel2":i===okIdx?"good":"bad");
+      const f=$(fbId);f.hidden=false;f.className="fb "+(okIdx===undefined?"nt":i===okIdx?"ok":"no");f.textContent=fbs[i];
+      if(cb)cb();
+    };
+    box.appendChild(b);
+  });
+}
+$("srev").onclick=()=>{$("sref").hidden=false;$("sq").hidden=false;$("srev").hidden=true};
+$("cbtn").onclick=()=>{$("compt").textContent=CFGS.compliance;$("comp").hidden=false;$("cbtn").hidden=true};
+function initS(){
+  ["sref","sq","comp","cbtn","qf_uts","qf_ys","qf_E"].forEach(i=>$(i).hidden=true);$("srev").hidden=false;
+  choice("q_uts","qf_uts",CFGS.uts);choice("q_ys","qf_ys",CFGS.ys);
+  choice("q_E","qf_E",CFGS.E,2,()=>{$("cbtn").hidden=!$("comp").hidden});
+  renderSum();
+}
+function goTab(t){
+  tab=t;document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x.dataset.t===t));
+  ["uts","ymod","ys","sum"].forEach(id=>$(id).hidden=id!==t);if(t==="sum")renderSum();window.scrollTo({top:0});
+}
+let tab="uts";
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>goTab(b.dataset.t));
+$("reset").onclick=()=>{tab==="uts"?init():tab==="ymod"?initE():tab==="ys"?initY():initS()};
+$("resetall").onclick=()=>{$("warn").hidden=false};
+$("wno").onclick=()=>{$("warn").hidden=true};
+$("wyes").onclick=()=>{
+  M3.forEach(m=>{RES[m]={}});$("mat").selectedIndex=0;
+  document.querySelector('[data-t="sum"]').hidden=true;
+  init();initE();initY();initS();prog();goTab("uts");$("warn").hidden=true;
+};
+init();initE();initY();initS();prog();
+</script>
+</body>
+</html>
