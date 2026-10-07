@@ -165,7 +165,8 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 <text x="585" y="125" class="lb" fill="#e8590c">Machine</text><text x="585" y="141" class="tk">(deflection)</text>
 <text x="585" y="255" class="lb">Specimen</text><text x="585" y="271" class="tk">(extension)</text>
 <text x="420" y="372" class="lb">Crosshead displacement</text><text x="420" y="390" class="lb">= specimen extension</text><text x="420" y="408" class="lb" fill="#e8590c">+ machine deflection</text>
-</svg></div></div>
+</svg>
+<button class="alt" id="dbtn">How do you deal with machine compliance?</button><div id="dtxt" class="fb nt" hidden></div></div></div>
 <div class="card"><p id="endmsg" style="margin:0;font-weight:600"></p></div>
 </div>
 </section>
@@ -248,6 +249,7 @@ const CFGS = {
     "Look again. There should be a major discrepancy here: your calculated E will be much lower than the reference values. You followed all the experimental steps correctly, but the method here did not take into account 'machine compliance'.",
     "Yes, a major discrepancy: your calculated E is much lower than the reference values. You followed all the experimental steps correctly, but the method here did not take into account 'machine compliance'."
   ],
+  deal: "There are 2 main ways,\n1) Work out how much compliance the machine has, and then subtract it from your 'crosshead' stroke readings. To find the compliance in the machine you can just test something extremely stiff (it has nearly zero deflection) - so whatever deflection values come out must be due to compliance.\n2) Measure the sample's deflection directly using an extensometer. If you don't know what an extensometer is then go back to the prelab video and watch from 3:34.\n\nOption 2) above is preferred. And you can also get extensometers that work using images. Like a speed camera comparing the position of a moving car, photo-extensometers measure the movement of a surface under load.",
   compliance: "Machine compliance is the small elastic deflection of the machine itself under load. The load cell, grips, fixtures, crosshead and frame all stretch, bend or settle slightly. The software records crosshead displacement, which is the specimen's extension plus this machine deflection. Displacement (and so strain) is overestimated, so E = stress / strain comes out too low. Forces are measured directly, so UTS and yield strength are far less affected."
 };
 /* ============================ */
@@ -537,9 +539,10 @@ function choice(boxId,fbId,fbs,okIdx,cb){
   });
 }
 $("srev").onclick=()=>{$("sref").hidden=false;$("sq").hidden=false;$("srev").hidden=true};
+$("dbtn").onclick=()=>{$("dtxt").textContent=CFGS.deal;$("dtxt").hidden=false;$("dbtn").hidden=true};
 $("cbtn").onclick=()=>{$("compt").textContent=CFGS.compliance;$("comp").hidden=false;$("cbtn").hidden=true};
 function initS(){
-  ["sref","sq","comp","cbtn","qf_uts","qf_ys","qf_E"].forEach(i=>$(i).hidden=true);$("srev").hidden=false;
+  ["sref","sq","comp","cbtn","qf_uts","qf_ys","qf_E","dtxt"].forEach(i=>$(i).hidden=true);$("srev").hidden=false;$("dbtn").hidden=false;
   choice("q_uts","qf_uts",CFGS.uts);choice("q_ys","qf_ys",CFGS.ys);
   choice("q_E","qf_E",CFGS.E,2,()=>{$("cbtn").hidden=!$("comp").hidden});
   renderSum();
