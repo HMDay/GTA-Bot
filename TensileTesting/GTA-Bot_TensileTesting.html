@@ -195,7 +195,7 @@ const CFG = {
 const CFGE = {
   tolStress: 0.02, tolStrain: 0.02, tolE: 0.03,
   options: [
-    {t:"The stiffness of the material, found by calculating the gradient of the linear elastic region", ok:true, fb:"Correct"},
+    {t:"The stiffness of the material, found by calculating the gradient of the linear elastic region of a stress-strain graph", ok:true, fb:"Correct"},
     {t:"The maximum height on the Y-axis that the stress-strain graph reaches", fb:"Incorrect, this would correspond to the Ultimate Tensile Stress"},
     {t:"It's the area under the stress-strain curve, within the linear elastic region", fb:"Incorrect, this is actually the amount of strain energy the material has been subjected to."},
     {t:"The stiffness of the material, taking the gradient between any two points on a stress-strain graph", fb:"Incorrect, Young's Modulus is relevant before the material has reached its yield point - before plasticity occurs."}
@@ -228,7 +228,7 @@ const CFGY = {
   explain: "...and that's where the 0.2% offset method comes in. We take the initial gradient and slide it across by 0.2% strain on the x-axis. We then use this line and take the point of its intersection with our curve.",
   why: "It's a semi-arbitrary number that, once upon a time, experts agreed upon that we should all use as standard.",
   step3: "Look at your Force-Displacement graph on the Trapezium software. 0.2% strain corresponds to a point on the x-axis that is 0.002 × L₀. Where L₀ is the initial length of your sample. Enter your L₀ here.",
-  step4: "On your Trapezium graph, hold up a ruler and set it at the same gradient as the linear elastic region. Then slide it across until the bottom of the ruler starts at {X} mm on the x-axis, then take the point where it intersects your curve."
+  step4: "On your Trapezium graph, hold up a ruler and set it at the same gradient as the linear elastic region. Then slide it across until the bottom of the ruler starts at {X} mm on the x-axis, then take the point where it intersects your curve. NOTE - this is a very poor method we are only taking here so we can finish the lab on time."
 };
 const CFGS = {
   end: "Great, that's all the analysis done! Now go back to the labsheet to Section 6.",
@@ -383,7 +383,7 @@ const ROWS=[["Force (N)","f1","f2"],["Displacement (mm)","d1","d2"]],ROWS2=[["Ar
 const inp=id=>`<input id="e_${id}" type="number" step="any" inputmode="decimal">`;
 function buildPanel(){
   const row=r=>`<b>${r[0]}</b>${inp(r[1])}${r[2]?inp(r[2]):"<span></span>"}`;
-  $("eg1").innerHTML=`<span></span><b>Point 1</b><b>Point 2</b>`+ROWS.map(row).join("")+
+  $("eg1").innerHTML=`<span></span><b>First Point</b><b>Second Point</b>`+ROWS.map(row).join("")+
    `<div id="e2" style="display:contents" hidden>${ROWS2.map(row).join("")}<button id="echk2" hidden style="grid-column:1/-1;justify-self:start;margin:0">Check stress and strain</button><div id="efb2a" class="mini" style="grid-column:1/-1;margin:0"></div></div>`+
    `<div id="e3" style="display:contents" hidden><b>E (GPa)</b>${inp("E")}<span></span></div>`;
   $("ep").insertAdjacentHTML("beforeend",`<button id="echk" hidden>Check</button><div id="efb2" class="mini"></div>`);
