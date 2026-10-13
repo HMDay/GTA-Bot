@@ -69,7 +69,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 <body>
 <main>
 <h1>Tensile test analysis</h1>
-<div class="mat">Material you are testing: <select id="mat"><option>Steel</option><option>PET</option><option>MDF</option></select></div>
+<div class="mat">Material you are testing: <select id="mat"><option>Steel</option><option>MDF</option></select></div>
 <div class="mini" id="prog" style="margin:-4px 0 10px"></div>
 <div class="tabs"><button class="on" data-t="uts">Ultimate tensile strength</button><button data-t="ymod">Young's modulus</button><button data-t="ys">0.2% Offset Yield Stress</button><button data-t="sum" hidden>Summary</button></div>
 <section id="uts">
@@ -213,7 +213,7 @@ const CFGE = {
   ok: "Correct, E = Δσ / Δε within the linear elastic region\nNow click onto the 0.2% Offset Yield Stress tab"
 };
 const CFGY = {
-  y4mdf: "Unlike Steel and PET, the offset line never meets the curve before MDF fractures. In these cases we take the yield point as equal to the UTS. What is the force here?",
+  y4mdf: "Unlike Steel, the offset line never meets the curve before MDF fractures. In these cases we take the yield point as equal to the UTS. What is the force here?",
   first: "Great, notice how a Summary tab has now appeared at the top. As you work through, your numbers will automatically be collected there.\nNow choose another material and select it in the dropdown box at the top of this tool.",
   later: "Great, your numbers have been added to the Summary tab.\nNow choose another material and select it in the dropdown box at the top of this tool.",
   last: "Great, your numbers have been added to the Summary tab.\nGo to the Summary Tab now to review your results.",
@@ -233,8 +233,9 @@ const CFGY = {
 };
 const CFGS = {
   end: "Great, that's all the analysis done! Now go back to the labsheet to Section 6.",
-  intro: "So here are all the properties you've just calculated, plus some given properties for Aluminium determined in the same way.",
+  intro: "So here are all the properties you've just calculated, plus some given properties for PET and Aluminium determined in the same way.",
   refIntro: "Reference Values - these are material properties from web sources and manufacturers:",
+  givenPET: ["2.7","63","85"],   // PET given values: E (GPa), 0.2% yield (MPa), UTS (MPa)
   given: ["8.7","99.9","106"],   // Aluminium 1050 given values: E (GPa), 0.2% yield (MPa), UTS (MPa)
   ref: {
     "MDF": ["4","(See UTS)","18"],
@@ -494,8 +495,8 @@ function initY(){
   drawY1();
 }
 /* ===== results, yield check, summary ===== */
-const RES={"Steel":{},"PET":{},"MDF":{}};
-const M3=["Steel","PET","MDF"];
+const RES={"Steel":{},"MDF":{}};
+const M3=["Steel","MDF"];
 const full=m=>RES[m].E>0&&RES[m].ys>0&&RES[m].uts>0,nDone=()=>M3.filter(full).length;
 function prog(){$("prog").textContent="Progress: "+M3.map(m=>m+" "+["E","ys","uts"].filter(k=>RES[m][k]>0).length+"/3").join(" · ")}
 function save(k,v){RES[$("mat").value][k]=v;prog();if(nDone()>0)document.querySelector('[data-t="sum"]').hidden=false}
@@ -509,7 +510,7 @@ $("yc4").onclick=()=>{
   if(Math.abs(S/(F_/A)-1)<=0.02){
     const m=$("mat").value;
     if(REPLAY)save("ys",S);
-    else{const firstTime=nDone()===0;save("ys",S);RES[m]._msg=!full(m)?"Great, so the 0.2% Offset Yield Strength is "+S+" MPa.\n"+CFGY.finish:firstTime?CFGY.first:nDone()>=3?CFGY.last:CFGY.later}
+    else{const firstTime=nDone()===0;save("ys",S);RES[m]._msg=!full(m)?"Great, so the 0.2% Offset Yield Strength is "+S+" MPa.\n"+CFGY.finish:firstTime?CFGY.first:nDone()>=M3.length?CFGY.last:CFGY.later}
     f.className="mini ok";
     f.textContent=RES[m]._msg;
   }
@@ -524,7 +525,7 @@ function table(el_,rows){
 }
 function renderSum(){
   $("sumt").textContent=CFGS.intro;$("endmsg").textContent=CFGS.end;$("sreft").textContent=CFGS.refIntro;
-  table($("tmine"),MATS.map(m=>m==="Aluminium 1050"?[m,...CFGS.given]:[m,fmt(RES[rk(m)].E,1),fmt(RES[rk(m)].ys),fmt(RES[rk(m)].uts)]));
+  table($("tmine"),MATS.map(m=>m==="Aluminium 1050"?[m,...CFGS.given]:m==="PET"?[m,...CFGS.givenPET]:[m,fmt(RES[rk(m)].E,1),fmt(RES[rk(m)].ys),fmt(RES[rk(m)].uts)]));
   table($("tref"),MATS.map(m=>[m,...CFGS.ref[m]]));
 }
 function choice(boxId,fbId,fbs,okIdx,cb){
